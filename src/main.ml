@@ -43,12 +43,11 @@ let rec main ctx =
   main nctx
 
 type widget = { tm : float
-              ; sender : (string -> unit)
               ; arg    : string}
   
 let construct w =
   Lwt_unix.sleep w.tm >>= fun _ ->
-  return @@ w.sender w.arg
+  return w.arg
 
 let update w thread =
   match Lwt.state thread with
@@ -56,17 +55,19 @@ let update w thread =
   | _            -> thread                
                                             
 let () =
-  let e1, e1_send = E.create () in
-  let e2, e2_send = E.create () in
-  let wl = [{tm = 1.; sender = e1_send; arg = "Each second"};
-            {tm = 3.; sender = e2_send; arg = "Each 3 secs"}] in
+  let e, send = E.create () in
+  let wl = [{tm = 3.; arg = "Each 3 secs"};
+            {tm = 1.; arg = "Each second"}
+            ] in
   let tl = List.map construct wl in 
   let rec loop tl =
-    Lwt.choose tl >>= fun _ ->
+    Lwt.nchoose tl
+    >>= fun lst ->
+    BatString.concat " " lst
+    |> send;
     List.map2 update wl tl |> loop
   in
-  let p1 = E.map print_endline e1 in
-  let p2 = E.map print_endline e2 in
+  let p = E.map print_endline e in
   Lwt_main.run (loop tl)
   (*
   let f1 = (pr_time % Unix.gettimeofday) in
