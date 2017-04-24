@@ -8,13 +8,13 @@ let () =
   let wl = [(Plugins.create 3. "date")
            ;(Plugins.create 1. "date")
            ] in
-  let tl = List.map (fun w -> w#eval) wl in 
+  let tl = List.map Plugins.eval wl in 
   let rec loop tl =
     Lwt.nchoose tl
     >>= fun lst ->
     String.concat " " lst
     |> send;
-    List.map2 (fun w t -> w#update t) wl tl |> loop
+    List.map2 Plugins.update wl tl |> loop
   in
   let p = E.map print_endline e in
   Lwt_main.run (loop tl)
