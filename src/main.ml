@@ -4,19 +4,16 @@ open Lwt_react
 open Plugins
                                             
 let () =
-  let e, send = E.create () in
-  let wl = [(Plugins.create 3. "date")
-           ;(Plugins.create 1. "date")
+  let wl = [(Plugins.create "date" 3. "test")
+           ;(Plugins.create "date" 1. "test")
            ] in
-  let tl = List.map Plugins.eval wl in 
+  let ev = List.map (fun (e,_) -> E.map print_endline e) wl in
+  let tl = List.map (fun (_,p) -> p ()) wl in 
   let rec loop tl =
-    Lwt.nchoose tl
-    >>= fun lst ->
-    String.concat " " lst
-    |> send;
-    List.map2 Plugins.update wl tl |> loop
+    Lwt.choose tl
+    >>= fun _ ->
+    return ()
   in
-  let p = E.map print_endline e in
   Lwt_main.run (loop tl)
 
   

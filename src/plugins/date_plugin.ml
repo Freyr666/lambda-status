@@ -6,6 +6,18 @@ let pr_time () =
   Printf.sprintf "%02d:%02d:%02d"
                  tm.Unix.tm_hour tm.Unix.tm_min tm.Unix.tm_sec
 
+module Date_worker : WORKER with type args = string =
+struct
+  type args = string
+  type t = { tm   : float
+           ; info : string }
+  let create f info =
+    { tm = f; info = info }
+  let timer t = t.tm
+  let get_val t = t.info ^ pr_time ()
+end
+  
+  (*
 class date timeout =
 object(self)
   inherit widget timeout
@@ -22,3 +34,4 @@ object(self)
     | _            -> thread
                     
 end 
+   *)
