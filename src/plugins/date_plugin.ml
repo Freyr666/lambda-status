@@ -1,37 +1,31 @@
 open Lwt
+open Lwt_react
 open Widget
 
-let pr_time () =
-  let tm = Unix.localtime @@ Unix.gettimeofday () in
-  Printf.sprintf "%02d:%02d:%02d"
-                 tm.Unix.tm_hour tm.Unix.tm_min tm.Unix.tm_sec
-
-module Date_worker : WORKER with type args = string =
+module Date : WIDGET with type args = (float * string) =
 struct
-  type args = string
+  type args = (float * string)
   type t = { tm   : float
            ; info : string }
-  let create f info =
-    { tm = f; info = info }
-  let timer t = t.tm
+
+  let pr_time () =
+    let tm = Unix.localtime @@ Unix.gettimeofday () in
+    Printf.sprintf "%02d:%02d:%02d"
+                   tm.Unix.tm_hour tm.Unix.tm_min tm.Unix.tm_sec
+
   let get_val t = t.info ^ pr_time ()
+         
+  let create (f,info) =
+    { tm = f; info = info }
+    
+  let get_event_loop (t : t) =
+    let e, send = E.create () in
+    let rec loop () =
+      Lwt_unix.sleep t.tm
+      >>= fun _ ->
+      Lwt.return @@ get_val t
+      >>= fun r ->
+      send r; loop ()
+    in
+    e, loop
 end
-  
-  (*
-class date timeout =
-object(self)
-  inherit widget timeout
-
-  val tm = timeout
-
-  method eval =
-    Lwt_unix.sleep tm >>= fun _ ->
-    return @@ pr_time ()
-
-  method update thread =
-    match Lwt.state thread with
-    | Lwt.Return _ -> self#eval
-    | _            -> thread
-                    
-end 
-   *)
