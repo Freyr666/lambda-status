@@ -4,8 +4,9 @@ open Lwt_react
 open Plugins
                                             
 let () =
-  let wl = [(Plugins.create "date" 3. "test")
-           ;(Plugins.create "date" 1. "test")
+  let wl = [ Plugins.create Date (3., "test")
+           ; Plugins.create Date (1., "test")
+           ; Plugins.create Pipe ()
            ] in
   let ev = List.map (fun (e,_) -> E.map print_endline e) wl in
   let tl = List.map (fun (_,p) -> p ()) wl in 
