@@ -1,0 +1,6 @@
+true: annot, bin_annot, optimize(3), unbox_closures, thread
+
+<src> : include
+<src/plugins> : include
+
+true: package(containers), package(lwt), package(lwt.unix), package(lwt_react)

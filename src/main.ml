@@ -4,12 +4,15 @@ open Lwt_react
 open Plugins
                                             
 let () =
-  let wl = [ Plugins.create Date (3., "test")
-           ; Plugins.create Date (1., "test")
-           ; Plugins.create Pipe ()
+  let plug_db = init_plugins () in
+  let wl = [ "date", "3."
+           ; "date", "10."
+           ; "pipe", ""
            ] in
-  let ev = List.map (fun (e,_) -> E.map print_endline e) wl in
-  let tl = List.map (fun (_,p) -> p ()) wl in 
+  let plugs = List.map (fun (n, c) -> Widget.create_inst plug_db n c) wl in
+  let eventloops = List.map get_event_loop plugs in
+  let ev = List.map (fun (e,_) -> E.map print_endline e) eventloops in
+  let tl = List.map (fun (_,p) -> p ()) eventloops in 
   let rec loop tl =
     Lwt.choose tl
     >>= fun _ ->

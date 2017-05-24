@@ -1,4 +1,4 @@
 S src/**
 B _build/**
 B +threads
-PKG containers react lwt
+PKG containers react lwt lwt_react
