@@ -15,12 +15,11 @@ let known_widgets : (module WIDGET) list =
 
 let init_plugins () : plugins = build_known_table known_widgets
 
-let lookup : (plugins -> string -> (module WIDGET)) =
-  (fun t k ->
-    try lookup_known_table t k
-    with _ -> raise No_plugin_avail)
+module Interface = struct
+         
+  let create : (plugins -> string -> string -> (module WIDGET_INST)) = create_inst
+                                                  
+  let get_event_loop (module Plug : WIDGET_INST) =
+    Plug.W.create Plug.conf
 
-let create : (plugins -> string -> string -> (module WIDGET_INST)) = create_inst
-
-let get_event_loop (module Plug : WIDGET_INST) =
-  Plug.W.create Plug.conf
+end 
