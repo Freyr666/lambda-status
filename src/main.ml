@@ -2,17 +2,22 @@ open Containers
 open Lwt
 open Lwt_react
 open Plugins
-                                            
+open Show
+
+module Dis = Display(I3bar)
+   
 let () =
   let plug_db = init_plugins () in
-  let wl = [ "date", "3."
-           ; "date", "10."
-           ; "pipe", ""
+  let wl = [ "date", ["tm","3."]
+           ; "date", ["tm","10."]
+           ; "pipe", ["",""]
            ] in
-  let plugs = List.map (fun (n, c) -> Interface.create plug_db n c) wl in
+  let plugs = List.map (fun (n, c) -> Interface.create plug_db n (snd @@ List.hd c)) wl in
+  let names = List.map fst wl in
   let eventloops = List.map Interface.get_event_loop plugs in
-  let ev = List.map (fun (e,_) -> E.map print_endline e) eventloops in
-  let tl = List.map (fun (_,p) -> p ()) eventloops in 
+  let ev = List.map (fun (e,_) -> e) eventloops in
+  let _  = Dis.init () names ev in
+  let tl = List.map (fun (_,p) -> p ()) eventloops in
   let rec loop tl =
     Lwt.choose tl
     >>= fun _ ->

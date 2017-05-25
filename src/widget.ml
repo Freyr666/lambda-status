@@ -3,7 +3,7 @@ open Lwt
 open Lwt_react
 
 exception Bad_config of string * string
-   
+                      
 module type WIDGET = sig
   val name             : string
   type config

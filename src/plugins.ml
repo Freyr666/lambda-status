@@ -4,6 +4,8 @@ let (%) f g x = f (g x)
    
 exception No_plugin_avail
 
+type config_item = string * (string * string) list (* name, config list *)
+        
 type event_loop = string React.event * (unit -> unit Lwt.t)
 
 type plugins = (module WIDGET) Widget_tbl.t
