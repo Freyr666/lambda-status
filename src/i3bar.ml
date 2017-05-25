@@ -21,4 +21,4 @@ let pack arr =
     if ind >= l then acc
     else loop arr (succ ind) sep (acc ^ sep ^ arr.(ind))
   in
-  "[" ^ (loop arr ind "," res) ^ "]"
+  "[" ^ (loop arr ind "," res) ^ "],"
